@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <meta http-equiv="Content-Security-Policy" content="script-src file://*">
+    <style>
+      #canvas {
+        border: .2em solid black;
+        width: 1000px;
+        height: 500px;
+      }
+    </style>
+  </head>
+  <body>
+    <canvas id="canvas"></canvas>
+    <button id="evolve-button">Evolve</button>
+    <p>Evolution time: <span id="evolution-time"></span> ms.</p>
+    <p>Paint time: <span id="paint-time"></span> ms.</p>
+    <script src="js/main.js"></script>
+  </body>
+</html>

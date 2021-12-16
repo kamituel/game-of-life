@@ -1,0 +1,14 @@
+;; shadow-cljs configuration
+{:source-paths
+ ["src"]
+
+ :dependencies
+ []
+
+ :dev-http
+ {8000 "_site"}
+
+ :builds
+ {:app {:target     :browser
+        :output-dir "_site/js"
+        :modules    {:main {:entries [game-of-life]}}}}}
