@@ -1,4 +1,6 @@
-(ns game-of-life.utils)
+(ns game-of-life.utils
+  
+  (:require [clojure.string :as str]))
 
 
 (defn add-index [xs]
@@ -13,3 +15,13 @@
   (let [start-time (js/performance.now)]
     (f)
     (- (js/performance.now) start-time)))
+
+
+(defn print-board! [board]
+
+  (doseq [[row-index row] (add-index board)]
+    (js/console.log
+     (if (< row-index 10)
+       (str " " row-index)
+       (str row-index))
+     (str/join "" (map #(if (= :alive %) 1 0) row)))))
