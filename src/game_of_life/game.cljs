@@ -1,20 +1,8 @@
-(ns game-of-life
+(ns game-of-life.game
   
-  (:require [clojure.string :as str]))
-
-
-(defn add-index [xs]
-
-  (map-indexed
-   (fn [idx x] [idx x])
-   xs))
-
-
-(defn measure-time [f]
-  
-  (let [start-time (js/performance.now)]
-    (f)
-    (- (js/performance.now) start-time)))
+  (:require [clojure.string :as str]
+            [game-of-life.boards :as boards]
+            [game-of-life.utils :as utils]))
 
 
 (defn find-canvas-or-fail []
@@ -33,8 +21,8 @@
 (defn paint-board! [config canvas board]
 
   (let [ctx (.getContext canvas "2d")]
-    (doseq [[row-index row] (add-index board)]
-      (doseq [[col-index status] (add-index row)]
+    (doseq [[row-index row] (utils/add-index board)]
+      (doseq [[col-index status] (utils/add-index row)]
         (let [color (if (= :alive status)
                       "black"
                       "white")
@@ -44,13 +32,6 @@
           (set! (.. ctx -fillStyle) color)
           (.fillRect ctx x y scale scale))))))
 
-
-(defn random-board [width height]
-  
-  (repeatedly height
-              (fn []
-                (repeatedly width
-                            #(rand-nth [:dead :alive])))))
 
 
 (defn offset-position [size pos offset]
@@ -97,18 +78,15 @@
       (nth col-index)))
 
 
-(defn set-cell [board row-index col-index status]
-  (assoc-in board [row-index col-index] status))
-
 
 (defn evolve [board config]
   
   (let [{:keys [width height]} config]
 
     (doall
-     (for [[row-index row] (add-index board)]
+     (for [[row-index row] (utils/add-index board)]
        (doall
-        (for [[col-index status] (add-index row)]
+        (for [[col-index status] (utils/add-index row)]
 
           (let [neighbours-indexes (all-neighbours-positions height width row-index col-index)
                 neigbours (map (fn [[row-index col-index]]
@@ -123,33 +101,8 @@
               :dead))))))))
 
 
-(defn sample-board []
-  (let [board (mapv identity
-                    (repeat 50 (mapv identity
-                                     (repeat 50 :dead))))]
-    (-> board
-        ;; Oscillator - blinker
-        (set-cell 20 20 :alive)
-        (set-cell 20 21 :alive)
-        (set-cell 20 22 :alive)
-        ;; Oscillator - beacon
-        (set-cell 30 20 :alive)
-        (set-cell 30 21 :alive)
-        (set-cell 31 20 :alive)
-        (set-cell 32 23 :alive)
-        (set-cell 33 22 :alive)
-        (set-cell 33 23 :alive)
-        ;; Glider
-        (set-cell 20 47 :alive)
-        (set-cell 20 48 :alive)
-        (set-cell 20 49 :alive)
-        (set-cell 19 49 :alive)
-        (set-cell 18 48 :alive)
-        )))
-
-
 (defn print-board! [board]
-  (doseq [[row-index row] (add-index board)]
+  (doseq [[row-index row] (utils/add-index board)]
     (js/console.log
      (if (< row-index 10)
        (str " " row-index)
@@ -159,10 +112,10 @@
 
 (defn step [config canvas !board]
 
-  (let [evolution-time (measure-time #(swap! !board evolve config))]
+  (let [evolution-time (utils/measure-time #(swap! !board evolve config))]
     (set! (.. (js/document.getElementById "evolution-time") -textContent) evolution-time))
   
-  (let [paint-time (measure-time #(paint-board! config canvas @!board))]
+  (let [paint-time (utils/measure-time #(paint-board! config canvas @!board))]
     (set! (.. (js/document.getElementById "paint-time") -textContent) paint-time))
   
   #_(print-board! @!board))
@@ -175,7 +128,7 @@
                  :interval-ms 0}
         canvas  (find-canvas-or-fail)
         !board  (atom #_(oscillator)
-                      (random-board
+                      (boards/random-board
                          (:width config)
                          (:height config)))]
 
