@@ -1,6 +1,4 @@
-(ns game-of-life.paint
-  
-  (:require [game-of-life.utils :as utils]))
+(ns game-of-life.paint)
 
 
 (defn find-canvas-or-fail []
@@ -18,14 +16,18 @@
 
 (defn paint-board! [config canvas board]
 
-  (let [ctx (.getContext canvas "2d")]
-    (doseq [[row-index row] (utils/add-index board)]
-      (doseq [[col-index status] (utils/add-index row)]
-        (let [color (if (= :alive status)
-                      "black"
-                      "white")
-              scale (:scale config)
-              x     (* col-index scale)
-              y     (* row-index scale)]
-          (set! (.. ctx -fillStyle) color)
-          (.fillRect ctx x y scale scale))))))
+  (let [ctx    (.getContext canvas "2d")
+        height (:height config)
+        width  (:width config)
+        scale  (:scale config)]
+    (dotimes [pos (* height width)]
+      (let [row-index (int (/ pos width))
+            col-index (rem pos width)
+            y         (* scale row-index)
+            x         (* scale col-index)
+            alive?    (= 1 (aget board pos))
+            color     (if alive?
+                        "black"
+                        "white")]
+        (set! (.. ctx -fillStyle) color)
+        (.fillRect ctx x y scale scale)))))

@@ -13,24 +13,24 @@
     (dom/set-text-content! (dom/by-id "evolution-time") evolution-time))
 
   (let [paint-time (utils/measure-time #(paint/paint-board! config canvas @!board))]
-    (dom/set-text-content! (dom/by-id "paint-time]") paint-time))
-
-  #_(print-board! @!board))
+    (dom/set-text-content! (dom/by-id "paint-time") paint-time)))
 
 
 
 (defn -main []
-  (let [config  {:width       100
-                 :height      50
-                 :scale       10
+  (let [config  {:width       240
+                 :height      140
+                 :scale       5
                  :interval-ms 0}
 
         canvas  (paint/find-canvas-or-fail)
 
-        !board  (atom #_(oscillator)
-                      (boards/random-board
-                       (:width config)
-                       (:height config)))]
+        !board  (atom (boards/sample-board
+                         (:height config)
+                         (:width config))
+                      #_(boards/random-board
+                       (:height config)
+                       (:width config)))]
 
     (paint/resize-canvas! config canvas)
     (paint/paint-board! config canvas @!board)
