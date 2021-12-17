@@ -8,7 +8,8 @@
 
 (defn step [!game]
   
-  (let [{:keys [board canvas height width scale auto-step? interval-ms] :as game}
+  (let [{:keys [board canvas height width scale
+                auto-step? interval-ms callback] :as game}
         @!game
 
         [evolution-time new-board]
@@ -23,6 +24,13 @@
            :evolution-time evolution-time
            :paint-time paint-time)
     
+    (when callback
+      (callback
+       (clj->js
+        {:evolution_time evolution-time
+         :paint_time paint-time
+         :generation (inc (:generation game))})))
+    
     (when auto-step?
       (js/window.setTimeout
        #(step !game)
@@ -30,7 +38,7 @@
             0)))))
 
 
-(defn ^:export create-game [canvas-element]
+(defn ^:export create-game [canvas-element callback]
   
   (let [scale          5
         [height width] (paint/board-dimensions canvas-element scale)]
@@ -43,7 +51,8 @@
            :height      height
            :canvas      canvas-element
            :generation  0
-           :interval-ms 0})))
+           :interval-ms 0
+           :callback    callback})))
 
 
 (defn ^:export generate-board [!game board-type]

@@ -142,7 +142,13 @@
       let $ = document.querySelector.bind(document)
       let $$ = (x) => Array.from(document.querySelectorAll(x))
 
-      let game = game_of_life.main.create_game($('#canvas'))
+      let callback = (stats) => {
+        $('#generation').textContent = stats.generation
+        $('#evolution-time').textContent = `${stats.evolution_time.toFixed(0)} ms`
+        $('#paint-time').textContent = `${stats.paint_time.toFixed(0)} ms`
+      }
+
+      let game = game_of_life.main.create_game($('#canvas'), callback)
       game_of_life.main.generate_board(game, 'random-50')
 
       $$('button').forEach((button) => {
