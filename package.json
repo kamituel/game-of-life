@@ -4,6 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "release": "shadow-cljs release app",
     "watch": "shadow-cljs watch app"
   },
   "author": "",

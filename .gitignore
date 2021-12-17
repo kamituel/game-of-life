@@ -1,6 +1,5 @@
 .clj-kondo/
 .lsp/
 .shadow-cljs/
-docs/js/*
-!docs/js/main.js
+_site/js/*
 node_modules/

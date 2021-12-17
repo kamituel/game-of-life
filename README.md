@@ -3,7 +3,7 @@
 ## Development
 
 ```bash
-$ ./node_modules/.bin/shadow-cljs watch app
+$ npm run watch
 ```
 
 Then open [http://localhost:8000](http://localhost:8000).
@@ -11,5 +11,5 @@ Then open [http://localhost:8000](http://localhost:8000).
 ## Release
 
 ```bash
-$ ./node_modules/.bin/shadow-cljs release app
+$ npm run release
 ```
