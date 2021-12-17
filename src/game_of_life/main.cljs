@@ -1,48 +1,78 @@
 (ns game-of-life.main
 
   (:require [game-of-life.boards :as boards]
-            [game-of-life.dom :as dom]
             [game-of-life.game :as game]
             [game-of-life.paint :as paint]
             [game-of-life.utils :as utils]))
 
 
-(defn step [config canvas !board]
+(defn step [!game]
+  
+  (let [{:keys [board canvas height width scale auto-step? interval-ms] :as game}
+        @!game
 
-  (let [evolution-time (utils/measure-time #(swap! !board game/evolve config))]
-    (dom/set-text-content! (dom/by-id "evolution-time") evolution-time))
+        [evolution-time new-board]
+        (utils/measure-time #(game/evolve board height width))
 
-  (let [paint-time (utils/measure-time #(paint/paint-board! config canvas @!board))]
-    (dom/set-text-content! (dom/by-id "paint-time") paint-time)))
+        [paint-time _]
+        (utils/measure-time #(paint/paint-board! canvas new-board height width scale))]
 
-
-
-(defn -main []
-  (let [config  {:width       240
-                 :height      140
-                 :scale       5
-                 :interval-ms 0}
-
-        canvas  (paint/find-canvas-or-fail)
-
-        !board  (atom #_(boards/sample-board
-                         (:height config)
-                         (:width config))
-                      (boards/random-board
-                       (:height config)
-                       (:width config)))]
-
-    (paint/resize-canvas! config canvas)
-    (paint/paint-board! config canvas @!board)
-
-    (.addEventListener
-     (js/document.getElementById "evolve-button")
-     "click"
-     (partial step config canvas !board))
-
-    (js/window.setInterval
-     (partial step config canvas !board)
-     (:interval-ms config))))
+    (swap! !game assoc
+           :board new-board
+           :generation (inc (:generation game))
+           :evolution-time evolution-time
+           :paint-time paint-time)
+    
+    (when auto-step?
+      (js/window.setTimeout
+       #(step !game)
+       (max (- interval-ms evolution-time paint-time)
+            0)))))
 
 
-(-main)
+(defn ^:export create-game [canvas-element]
+  
+  (let [scale          5
+        [height width] (paint/board-dimensions canvas-element scale)]
+
+    (paint/resize-canvas!
+     canvas-element height width scale)
+
+    (atom {:scale       scale
+           :width       width
+           :height      height
+           :canvas      canvas-element
+           :generation  0
+           :interval-ms 0})))
+
+
+(defn ^:export generate-board [!game board-type]
+  
+  (let [board (boards/generate-board
+               (keyword board-type)
+               (:height @!game)
+               (:width @!game))
+        
+        {:keys [canvas
+                height 
+                width
+                scale]} @!game]
+
+    (swap! !game assoc :board board)
+    (paint/paint-board! canvas board height width scale)))
+
+
+(defn ^:export start-gameplay [!game]
+
+  (swap! !game assoc :auto-step? true)
+  (step !game))
+
+
+(defn ^:export stop-gameplay [!game]
+  
+  (swap! !game assoc :auto-step? false))
+
+
+(defn ^:export step-gameplay [!game]
+  
+  (step !game))

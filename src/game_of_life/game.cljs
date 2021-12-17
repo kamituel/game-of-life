@@ -52,10 +52,9 @@
                (inc neighbour-index))))))
 
 
-(defn evolve [board config]
+(defn evolve [board height width]
   
-  (let [{:keys [height width]} config
-        new-board (make-array (* height width))]
+  (let [new-board (make-array (* height width))]
 
     (dotimes [pos (* height width)]
       (let [row-index (int (/ pos width))

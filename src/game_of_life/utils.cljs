@@ -12,9 +12,10 @@
 
 (defn measure-time [f]
 
-  (let [start-time (js/performance.now)]
-    (f)
-    (- (js/performance.now) start-time)))
+  (let [start-time (js/performance.now)
+        result     (f)]
+    [(- (js/performance.now) start-time)
+     result]))
 
 
 (defn print-board! [board]
