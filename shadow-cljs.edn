@@ -6,9 +6,9 @@
  []
 
  :dev-http
- {8000 "_site"}
+ {8000 "docs"}
 
  :builds
  {:app {:target     :browser
-        :output-dir "_site/js"
+        :output-dir "docs/js"
         :modules    {:main {:entries [game-of-life.main]}}}}}
