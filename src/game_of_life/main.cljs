@@ -25,10 +25,10 @@
 
         canvas  (paint/find-canvas-or-fail)
 
-        !board  (atom (boards/sample-board
+        !board  (atom #_(boards/sample-board
                          (:height config)
                          (:width config))
-                      #_(boards/random-board
+                      (boards/random-board
                        (:height config)
                        (:width config)))]
 
