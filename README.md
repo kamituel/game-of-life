@@ -1,5 +1,7 @@
 # Game of Life
 
+[Demo](https://confident-khorana-fafb9d.netlify.app/)
+
 ## Development
 
 ```bash
