@@ -3,6 +3,7 @@
   (:require [game-of-life.boards :as boards]
             [game-of-life.game :as game]
             [game-of-life.paint :as paint]
+            [game-of-life.templates :as templates]
             [game-of-life.utils :as utils]))
 
 
@@ -55,7 +56,7 @@
            :callback    callback})))
 
 
-(defn ^:export generate-board [!game board-type]
+(defn ^:export set_predefined_board [!game board-type]
   
   (let [board (boards/generate-board
                (keyword board-type)
@@ -64,6 +65,22 @@
         
         {:keys [canvas
                 height 
+                width
+                scale]} @!game]
+
+    (swap! !game assoc :board board)
+    (paint/paint-board! canvas board height width scale)))
+
+
+(defn ^:export set_custom_board [!game template-string]
+  
+  (let [board (boards/generate-board-from-template
+               (templates/parse-template template-string)
+               (:height @!game)
+               (:width @!game))
+
+        {:keys [canvas
+                height
                 width
                 scale]} @!game]
 

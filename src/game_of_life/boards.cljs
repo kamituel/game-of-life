@@ -34,6 +34,17 @@
       (set-cell board width (+ row-index row-offset) (+ col-index col-offset) status))))
 
 
+(defn generate-board-from-template [template height width]
+  
+  (doto (all-dead-board height width)
+    (draw-template width
+                   (int (- (/ height 2)
+                           (/ (templates/template-height template) 2)))
+                   (int (- (/ width 2)
+                           (/ (templates/template-width template) 2)))
+                   template)))
+
+
 (defmethod generate-board :random-50 [_ height width]
 
   (let [board (make-array (* height width))]

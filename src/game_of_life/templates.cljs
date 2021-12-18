@@ -167,7 +167,7 @@
     "})
 
 
-(defn- parse-template [string-template]
+(defn parse-template [string-template]
 
   (some-> string-template
           (str/trim)
