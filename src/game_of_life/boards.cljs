@@ -2,15 +2,16 @@
   
   (:require [clojure.string :as str]
             [game-of-life.game :as game]
+            [game-of-life.templates :as templates]
             [game-of-life.utils :as utils]))
 
 
 (defmulti generate-board
-  (fn [board-type height width]
+  (fn [board-type _height _width]
     board-type))
 
 
-(defn all-dead-board [height width]
+(defn- all-dead-board [height width]
 
   (let [board (make-array (* height width))]
     (dotimes [pos (* width height)]
@@ -18,123 +19,9 @@
     board))
 
 
-(defn set-cell [board width row-index col-index status]
+(defn- set-cell [board width row-index col-index status]
 
   (aset board (+ (* row-index width) col-index) status))
-
-
-(def pulsar-template
-  ["..OOO...OOO.."
-   "............."
-   "O....O.O....O"
-   "O....O.O....O"
-   "O....O.O....O"
-   "..OOO...OOO.."
-   "............."
-   "..OOO...OOO.."
-   "O....O.O....O"
-   "O....O.O....O"
-   "O....O.O....O"
-   "............."
-   "..OOO...OOO.."])
-
-
-(def blinker-template
-  
-  ["OOO"])
-
-
-(def toad-template
-  
-  [".OOO"
-   "OOO."])
-
-
-(def beacon-template
-  
-  ["OO..."
-   "OO..."
-   "..OO"
-   "..OO"])
-
-
-(def glider-template
-  
-  ["..O"
-   "O.O"
-   ".OO"])
-
-
-(def r-pentomino-template
-  
-  [".OO"
-   "OO."
-   ".O."])
-
-
-(def gosper-glider-gun
-  
-  [
-   "........................O..........."
-   "......................O.O..........."
-   "............OO......OO............OO"
-   "...........O...O....OO............OO"
-   "OO........O.....O...OO.............."
-   "OO........O...O.OO....O.O..........."
-   "..........O.....O.......O..........."
-   "...........O...O...................."
-   "............OO......................"])
-
-
-(def lightweight-space-ship-template
-
-  [".O..O"
-   "O...."
-   "O...O"
-   "OOOO."])
-
-
-;; By Bill Gosper, 1971
-(def puffer-train-1-template
-
-  [".OOO......O.....O......OOO."
-   "O..O.....OOO...OOO.....O..O"
-   "...O....OO.O...O.OO....O..."
-   "...O...................O..."
-   "...O..O.............O..O..."
-   "...O..OO...........OO..O..."
-   "..O...OO...........OO...O.."])
-
-
-;; By Richard Schank, 2014
-(def puffer-train-2-template
-  
-  ["...O.......O..."
-   "..OOO.....OOO.."
-   ".OO..O...O..OO."
-   "...OOO...OOO..."
-   "..............."
-   "....O.....O...."
-   "..O..O...O..O.."
-   "O.....O.O.....O"
-   "OO....O.O....OO"
-   "......O.O......"
-   "...O.O...O.O..."
-   "....O.....O...."])
-
-
-(defn rotate-template [template]
-
-  (loop [n                0
-         rotated-template []]
-    
-    (if (= n (count (first template)))
-
-      (map str/join rotated-template)
-
-      (recur (inc n)
-             (conj rotated-template
-                   (map #(nth % n) template))))))
 
 
 (defn draw-template [board width row-index col-index template]
@@ -165,43 +52,64 @@
       (aset board pos 0))
 
     (doto board
-      (draw-template width 20 20 blinker-template)
-      (draw-template width 20 30 toad-template)
-      (draw-template width 20 40 pulsar-template)
-      #_(draw-template width 20 60 glider-template)
-      (draw-template width 20 60 beacon-template)
-      (draw-template width 60 220 lightweight-space-ship-template)
-      (draw-template width 40 20 gosper-glider-gun)
-      #_(draw-template width 20 90 r-pentomino-template))))
+      (draw-template width 20 20 (templates/get-template :blinker-template))
+      (draw-template width 20 30 (templates/get-template :toad-template))
+      (draw-template width 20 40 (templates/get-template :pulsar-template))
+      (draw-template width 20 60 (templates/get-template :beacon-template))
+      (draw-template width 60 220 (templates/get-template :lightweight-space-ship-template))
+      (draw-template width 40 20 (templates/get-template :gosper-glider-gun)))))
 
 
 (defmethod generate-board :r-pentomino [_ height width]
 
   (doto (all-dead-board height width)
-    (draw-template width (int (/ height 2)) (int (/ width 2)) r-pentomino-template)))
+    (draw-template
+     width
+     (int (/ height 2))
+     (int (/ width 2))
+     (templates/get-template :r-pentomino-template))))
 
 
 (defmethod generate-board :puffer-train-1 [_ height width]
   
-  (let [template (->> puffer-train-1-template
+  (let [template (->> (templates/get-template :puffer-train-1-template)
                       reverse
-                      rotate-template)]
+                      templates/rotate-template)]
     (doto (all-dead-board height width)
       (draw-template width
                      (int (- (/ height 2)
-                             (/ (count template) 2)))
+                             (/ (templates/template-height template) 2)))
                      2
                      template))))
 
 
 (defmethod generate-board :puffer-train-2 [_ height width]
 
-  (let [template (->> puffer-train-2-template
+  (let [template (->> (templates/get-template :puffer-train-2-template)
                       reverse
-                      rotate-template)]
+                      templates/rotate-template)]
     (doto (all-dead-board height width)
       (draw-template width
                      (int (- (/ height 2)
-                             (/ (count template) 2)))
+                             (/ (templates/template-height template) 2)))
                      2
+                     template))))
+
+
+(defmethod generate-board :p60-gun [_ height width]
+  
+  (doto (all-dead-board height width)
+    (draw-template width
+                   10
+                   10
+                   (templates/get-template :p60-gun-template))))
+
+
+(defmethod generate-board :shuttle [_ height width]
+
+  (let [template (templates/get-template :shuttle)]
+    (doto (all-dead-board height width)
+      (draw-template width
+                     (int (/ (- height (templates/template-height template)) 2))
+                     (int (/ (- width (templates/template-width template)) 2))
                      template))))
