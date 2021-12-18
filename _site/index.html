@@ -111,17 +111,17 @@
           <h2>Board</h2>
           <form class="small-gap">
             <select id="board_template_type">
+              <option value="random">Random (50% alive)</option>
               <option value="predefined">Predefined template</option>
               <option value="custom">Custom template</option>
             </select>
             <select id="predefined_board_template_id">
-              <option value="random-50">Random (50% alive)</option>
-              <option value="sample-1">Sample #1</option>
               <option value="r-pentomino">R-pentomino</option>
               <option value="puffer-train-1">Puffer train #1 (Gosper, 1971)</option>
               <option value="puffer-train-2">Puffer train #2 (Schank, 2014)</option>
               <option value="p60-gun">p60 gun (Gosper, 1970)</option>
               <option value="shuttle">Shuttle (Beluchenko, 1970)</option>
+              <option value="washerwoman">Washerwoman (Abbe, 1971)</option>
             </select>
             <textarea id="custom_board_template_string"></textarea>
             <button data-action="generate_board">Generate</button>
@@ -156,54 +156,48 @@
       let $ = document.querySelector.bind(document)
       let $$ = (x) => Array.from(document.querySelectorAll(x))
 
-      function handleTemplateType () {
-        let select = $('#board_template_type')
-        let predefinedTemplateSelect = $('#predefined_board_template_id')
-        let customTemplateTextarea  = $('#custom_board_template_string')
+      let getState = () => ({
+        boardTemplateType: $('#board_template_type').value,
+        predefinedTemplateId: $('#predefined_board_template_id').value,
+        customTemplateString: $('#custom_board_template_string').value
+      })
 
-        let updateDom = (templateType) => {
-          switch (templateType) {
-            case 'predefined':
-            predefinedTemplateSelect.classList.remove('hidden')
-              customTemplateTextarea.classList.add('hidden')
-              break
-            case 'custom':
-            predefinedTemplateSelect.classList.add('hidden')
-              customTemplateTextarea.classList.remove('hidden')
-              break
-            default:
-              throw Error(`Unknown template type '${templateType}'.`)
-          }
+      let render = (state) => {
+        switch (state.boardTemplateType) {
+          case 'random':
+            $('#predefined_board_template_id').classList.add('hidden')
+            $('#custom_board_template_string').classList.add('hidden')
+            break
+          case 'predefined':
+            $('#predefined_board_template_id').classList.remove('hidden')
+            $('#custom_board_template_string').classList.add('hidden')
+            break
+          case 'custom':
+            $('#predefined_board_template_id').classList.add('hidden')
+            $('#custom_board_template_string').classList.remove('hidden')
+            break
+          default:
+            throw Error(`Unknown board template type: '${state.boardTemplateType}'.`)
         }
-
-        updateDom(select.value)
-
-        select.addEventListener('change', (event) => {
-          handleTemplateType(event.target.value)
-        })
       }
 
-      let callback = (stats) => {
-        $('#generation').textContent = stats.generation
-        $('#evolution-time').textContent = `${stats.evolution_time.toFixed(0)} ms`
-        $('#paint-time').textContent = `${stats.paint_time.toFixed(0)} ms`
-      }
+      let handleAction = (action) => {
+        let state = getState()
 
-      let game = game_of_life.main.create_game($('#canvas'), callback)
-      game_of_life.main.set_predefined_board(game, 'random-50')
-
-      handleTemplateType()
-
-      $$('button').forEach((button) => {
-        button.addEventListener('click', (event) => {
-          event.preventDefault()
-          let action = event.target.dataset.action
-          switch (action) {
+        switch (action) {
             case 'generate_board':
-              if ($('#board_template_type').value === 'predefined') {
-                game_of_life.main.set_predefined_board(game, $('#predefined_board_template_id').value)
-              } else {
-                game_of_life.main.set_custom_board(game, $('#custom_board_template_string').value)
+              switch (state.boardTemplateType) {
+                case 'random':
+                  game_of_life.main.set_random_board(game)
+                  break
+                case 'predefined':
+                  game_of_life.main.set_board_from_template_id(game, state.predefinedTemplateId)
+                  break
+                case 'custom':
+                  game_of_life.main.set_board_from_template_string(game, state.customTemplateString)
+                  break
+                default:
+                  throw Error(`Unknown board template type: '${state.boardTemplateType}'.`)
               }
               break
             case 'start_gameplay':
@@ -215,6 +209,30 @@
               alert('Error')
               null
           }
+      }
+
+      render(getState())
+
+      let callback = (stats) => {
+        $('#generation').textContent = stats.generation
+        $('#evolution-time').textContent = `${stats.evolution_time.toFixed(0)} ms`
+        $('#paint-time').textContent = `${stats.paint_time.toFixed(0)} ms`
+      }
+
+      let game = game_of_life.main.create_game($('#canvas'), callback)
+      game_of_life.main.set_random_board(game)
+
+      $$('button').forEach((button) => {
+        button.addEventListener('click', (event) => {
+          event.preventDefault()
+          let action = event.target.dataset.action
+          handleAction(action)
+        })
+      })
+
+      $$('select').forEach((select) => {
+        select.addEventListener('change', (event) => {
+          render(getState())
         })
       })
 

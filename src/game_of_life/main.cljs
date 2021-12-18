@@ -56,36 +56,41 @@
            :callback    callback})))
 
 
-(defn ^:export set_predefined_board [!game board-type]
+(defn- set-board [!game board]
   
-  (let [board (boards/generate-board
-               (keyword board-type)
-               (:height @!game)
-               (:width @!game))
-        
-        {:keys [canvas
-                height 
-                width
-                scale]} @!game]
-
-    (swap! !game assoc :board board)
-    (paint/paint-board! canvas board height width scale)))
-
-
-(defn ^:export set_custom_board [!game template-string]
-  
-  (let [board (boards/generate-board-from-template
-               (templates/parse-template template-string)
-               (:height @!game)
-               (:width @!game))
-
-        {:keys [canvas
+  (let [{:keys [canvas
                 height
                 width
                 scale]} @!game]
 
     (swap! !game assoc :board board)
     (paint/paint-board! canvas board height width scale)))
+
+
+(defn ^:export set_random_board [!game]
+
+  (set-board !game
+             (boards/generate-random-board
+              (:height @!game)
+              (:width @!game))))
+
+
+(defn ^:export set_board_from_template_id [!game template-id]
+
+  (set-board !game
+             (boards/generate-board-from-template
+              (templates/get-template (keyword template-id))
+              (:height @!game)
+              (:width @!game))))
+
+
+(defn ^:export set_board_from_template_string [!game template-string]
+  
+  (set-board !game
+             (boards/generate-board-from-template
+              (templates/parse-template template-string)
+              (:height @!game)
+              (:width @!game))))
 
 
 (defn ^:export start-gameplay [!game]

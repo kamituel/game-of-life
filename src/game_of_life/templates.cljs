@@ -5,7 +5,7 @@
 
 (def string-templates
   
-  {:pulsar-template
+  {:pulsar
    "
      ..OOO...OOO..
      .............
@@ -23,20 +23,20 @@
    "
 
 
-   :blinker-template
+   :blinker
    "
      OOO
    "
 
 
-   :toad-template
+   :toad
    "
      .OOO
      OOO.
    "
 
 
-   :beacon-template
+   :beacon
    "
      OO...
      OO...
@@ -45,7 +45,7 @@
    "
 
 
-   :glider-template
+   :glider
    "
      ..O
      O.O
@@ -53,7 +53,7 @@
    "
 
 
-   :r-pentomino-template
+   :r-pentomino
    "
      .OO
      OO.
@@ -75,7 +75,7 @@
    "
 
 
-   :lightweight-space-ship-template
+   :lightweight-space-ship
    "
      .O..O
      O....
@@ -85,7 +85,7 @@
 
 
    ;; By Bill Gosper, 1971
-   :puffer-train-1-template
+   :puffer-train-1
    "
      .OOO......O.....O......OOO.
      O..O.....OOO...OOO.....O..O
@@ -98,7 +98,7 @@
 
 
    ;; By Richard Schank, 2014
-   :puffer-train-2-template
+   :puffer-train-2
    "
      ...O.......O...
      ..OOO.....OOO..
@@ -116,7 +116,7 @@
 
 
    ;; By Bill Gosper, 1970
-   :p60-gun-template
+   :p60-gun
    "
 	   ............................O..........
 	   ............................O.O........
@@ -164,7 +164,54 @@
 	   ..........O...
 	   ...........OOO
 	   .............O
-    "})
+    "
+   
+   ;; By Earl Abbe, 1971
+   :washerwoman
+   "
+	   O.......................................................
+	   OO....O.....O.....O.....O.....O.....O.....O.....O.....O.
+	   OOO..O.O...O.O...O.O...O.O...O.O...O.O...O.O...O.O...O.O
+	   OO....O.....O.....O.....O.....O.....O.....O.....O.....O.
+	   O.......................................................
+   "
+   
+   ;; By Eppstein, 2000
+   :weekender
+   "
+	   .O............O.
+	   .O............O.
+	   O.O..........O.O
+	   .O............O.
+	   .O............O.
+	   ..O...OOOO...O..
+	   ......OOOO......
+	   ..OOOO....OOOO..
+	   ................
+	   ....O......O....
+	   .....OO..OO.....
+   "
+   
+   ;; 1992
+   :wickstretcher
+   "
+	   .................OO..............................
+	   .............OO....O.............................
+	   ............OOO.O................................
+	   O.OO..OO...O...OOOO.O.O....OO.......OO...........
+	   O....OO..O........O.OOO....O....OO.O..O.OO.O.....
+	   O.OO....OO.OO....O...........O...O.O.OO.O.OO.....
+	   ......O.......O.............OO.....O..O.O...OO...
+	   .....O.........O.O....OOO...O....O..O.O.OOO...O..
+	   .....O.........O.O....OOO.OO.O..OO.O.O...O..OO.O.
+	   ......O.......O.............OO.O...OO....OO....O.
+	   O.OO....OO.OO....O..........O........OO.O.O.OO.OO
+	   O....OO..O........O.OOO........O...O...OO.O..O.O.
+	   O.OO..OO...O...OOOO.O.O.......O.O...OO....O..O.O.
+	   ............OOO.O..............O.....O.OOO....O..
+	   .............OO....O.................O.O.........
+	   .................OO...................O..........
+   "})
 
 
 (defn parse-template [string-template]
