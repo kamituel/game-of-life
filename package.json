@@ -11,5 +11,8 @@
   "license": "ISC",
   "devDependencies": {
     "shadow-cljs": "^2.16.8"
+  },
+  "dependencies": {
+    "uhtml": "^2.8.0"
   }
 }

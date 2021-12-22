@@ -9,6 +9,8 @@
  {8000 "_site"}
 
  :builds
- {:app {:target     :browser
-        :output-dir "_site/js"
-        :modules    {:main {:entries [game-of-life.main]}}}}}
+ {:app {:target           :browser
+        :output-dir       "_site/js"
+        :modules          {:main {:entries [game-of-life.main]}}
+        ;; For template strings support from uhtml.
+        :compiler-options {:output-feature-set :es6}}}}
