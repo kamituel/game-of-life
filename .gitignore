@@ -2,5 +2,7 @@
 .lsp/
 .shadow-cljs/
 _site/js/*
+!_site/js/wasm.js
+!_site/js/wasm_bg.wasm
 node_modules/
 wasm/target/
