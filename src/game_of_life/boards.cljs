@@ -1,16 +1,25 @@
 (ns game-of-life.boards
   
   (:require [clojure.string :as str]
-            [game-of-life.game :as game]
             [game-of-life.templates :as templates]
             [game-of-life.utils :as utils]))
 
 
+(def alive 1)
+(def dead 0)
+
+
+(defn create-board [height width]
+  
+  (let [buffer (js/window.ArrayBuffer. (* height width))]
+    (js/window.Uint8Array. buffer)))
+
+
 (defn- all-dead-board [height width]
 
-  (let [board (make-array (* height width))]
+  (let [board (create-board height width)]
     (dotimes [pos (* width height)]
-      (aset board pos game/dead))
+      (aset board pos dead))
     board))
 
 
@@ -24,14 +33,14 @@
   (doseq [[row-offset row] (utils/add-index template)]
     (doseq [[col-offset status] (-> row
                                     (str/split #"")
-                                    (->> (map #(if (= "O" %) game/alive game/dead)))
+                                    (->> (map #(if (= "O" %) alive dead)))
                                     utils/add-index)]
       (set-cell board width (+ row-index row-offset) (+ col-index col-offset) status))))
 
 
 (defn generate-random-board [height width]
 
-  (let [board (make-array (* height width))]
+  (let [board (create-board height width)]
 
     (dotimes [pos (* width height)]
       (aset board pos (rand-nth [0 1])))

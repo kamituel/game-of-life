@@ -3,3 +3,4 @@
 .shadow-cljs/
 _site/js/*
 node_modules/
+wasm/target/

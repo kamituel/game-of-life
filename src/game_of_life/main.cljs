@@ -3,6 +3,8 @@
   (:require [game-of-life.boards :as boards]
             [game-of-life.dom :as dom]
             [game-of-life.game :as game]
+            [game-of-life.impl.game-cljs]
+            [game-of-life.impl.game-wasm]
             [game-of-life.paint :as paint]
             [game-of-life.templates :as templates]
             [game-of-life.utils :as utils]
@@ -11,13 +13,16 @@
 
 (def initial-state
   
-  {:paint     {:board   nil
-               :scale   5
-               :height  nil
-               :width   nil}
+  {:paint     {:board  nil
+               :scale  5
+               :height nil
+               :width  nil
+               :webgl  nil
+               :engine :canvas-2d-image-data}
 
-   :gameplay  {:auto-step?  false
-               :interval-ms 0}
+   :gameplay  {:auto-step?                  false
+               :interval-ms                 0
+               :evolution-implementation-id :wasm-rust}
 
    :view      {:board-type      :predefined
                :template-id     :puffer-train-2
@@ -32,9 +37,8 @@
 
 
 (defn paint! [canvas state]
-  
-  (let [{:keys [board height width scale]} (:paint state)]
-    (paint/paint-board! canvas board height width scale)))
+
+  (paint/paint-board! canvas (:paint state)))
 
 
 (defn advance-game! [canvas !state render-fn]
@@ -48,7 +52,10 @@
         (:paint state)
 
         [evolution-time new-board]
-        (utils/measure-time #(game/evolve board height width))
+        (utils/measure-time #(game/evolve (-> state :gameplay :evolution-implementation-id)
+                                          board
+                                          height
+                                          width))
 
         [paint-time _]
         (utils/measure-time
@@ -189,6 +196,11 @@
     
     (measure-and-resize-canvas!
      (:canvas @!refs) !state)
+    
+    (game/init (-> @!state :gameplay :evolution-implementation-id))
+    
+    #_(swap! !state assoc-in [:paint :webgl]
+           (paint/init-webgl! (:canvas @!refs)))
     
     (update-board! !state)
     (paint! (:canvas @!refs) @!state))) 

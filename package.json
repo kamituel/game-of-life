@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "release": "shadow-cljs release app",
+    "wasm-rust": "cd wasm && wasm-pack build --target no-modules --no-typescript --release && cp pkg/wasm_bg.wasm pkg/wasm.js ../_site/js/",
+    "release": "npm run wasm-rust && shadow-cljs release app",
     "watch": "shadow-cljs watch app"
   },
   "author": "",
