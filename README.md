@@ -23,5 +23,6 @@ Then open [http://localhost:8000](http://localhost:8000).
 To compile both ClojureScript and Rust code:
 
 ```bash
+$ npm run wasm-rust
 $ npm run release
 ```
