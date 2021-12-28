@@ -11,6 +11,14 @@
             [game-of-life.view :as view]))
 
 
+(def initial-stats
+  
+  {:generation     0
+   :evolution-time 0
+   :paint-time     0
+   :full-step-time 0})
+
+
 (def initial-state
   
   {:paint     {:board  nil
@@ -28,10 +36,7 @@
                :template-id     :puffer-train-2
                :template-string ".O.\nO.O\n.O."}
 
-   :stats     {:generation     0
-               :evolution-time 0
-               :paint-time     0
-               :full-step-time 0}
+   :stats     initial-stats
 
    :templates templates/string-templates})
 
@@ -120,6 +125,7 @@
   [_ !state _ _ board-type]
 
   (swap! !state assoc-in [:view :board-type] board-type)
+  (swap! !state assoc :stats initial-stats)
   (update-board! !state))
 
 
@@ -128,6 +134,7 @@
   [_ !state _ _ template-id]
 
   (swap! !state assoc-in [:view :template-id] template-id)
+  (swap! !state assoc :stats initial-stats)
   (update-board! !state))
 
 
@@ -136,6 +143,7 @@
   [_ !state _ _ template-string]
 
   (swap! !state assoc-in [:view :template-string] template-string)
+  (swap! !state assoc :stats initial-stats)
   (update-board! !state))
 
 
