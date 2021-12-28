@@ -5,12 +5,14 @@
     <meta http-equiv="Content-Security-Policy" content="script-src file://* https://* 'unsafe-eval' 'unsafe-inline' 'self'">
     <style>
       * {
-        font-family: monospace;
+        font-family: sans-serif;
+        box-sizing: border-box;
       }
 
       :root {
-        background-color: black;
+        background-color: hsl(120deg, 10%, 40%);
         color: white;
+        font-size: .9rem;
       }
 
       body, p, h1, h2 {
@@ -30,16 +32,16 @@
         min-height: 100vh;
         max-height: 100vh;
         overflow: hidden;
-        padding: var(--app-padding);
       }
 
       .app {
-        width: calc(100vw - 2 * var(--app-padding));
-        height: calc(100vh - 2 * var(--app-padding));
+        width: calc(100vw);
+        height: calc(100vh);
         display: grid;
         grid-template-columns: 1fr 16em;
         grid-template-rows: min-content 1fr;
         gap: var(--gap-standard);
+        padding: var(--app-padding);
       }
 
       aside {
@@ -49,18 +51,37 @@
       }
 
       select,
-      button {
+      button,
+      textarea {
         padding: .6em .3em;
+      }
+
+      select,
+      button,
+      textarea,
+      section,
+      canvas {
+        border-radius: 1em;
+      }
+
+      section {
+        background-color: hsl(120deg, 10%, 20%);
+        box-shadow: .4em .4em 1.5em -.4em hsl(120deg, 10%, 5%);
+        padding: 1em;
+      }
+
+      h1 {
+        font-size: 1.4rem;
       }
 
       h2 {
         text-transform: uppercase;
-        font-size: 1.2rem;
+        font-size: 1rem;
       }
 
       canvas {
         grid-row: span 2;
-        border: .2em dashed white;
+        border: .1em solid white;
         display: block;
         width: 100%;
         height: 100%;
@@ -80,6 +101,11 @@
 
       .stats > * > :first-child {
         flex-basis: 10em;
+      }
+
+      .stats > * > :last-child {
+        flex-grow: 1;
+        text-align: right;
       }
 
       .horizontal-equal {
