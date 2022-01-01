@@ -24,13 +24,13 @@ let wasm_bindgen;
     * @param {number} width
     * @param {Uint8Array} new_board
     */
-    __exports.main = function(board, width, new_board) {
+    __exports.evolve = function(board, width, new_board) {
         try {
             var ptr0 = passArray8ToWasm0(board, wasm.__wbindgen_malloc);
             var len0 = WASM_VECTOR_LEN;
             var ptr1 = passArray8ToWasm0(new_board, wasm.__wbindgen_malloc);
             var len1 = WASM_VECTOR_LEN;
-            wasm.main(ptr0, len0, width, ptr1, len1);
+            wasm.evolve(ptr0, len0, width, ptr1, len1);
         } finally {
             new_board.set(getUint8Memory0().subarray(ptr1 / 1, ptr1 / 1 + len1));
             wasm.__wbindgen_free(ptr1, len1 * 1);

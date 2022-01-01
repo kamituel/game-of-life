@@ -36,7 +36,7 @@
 (defn section-with-header [header contents]
 
   (js-template html
-    "<section class='small-gap'>
+    "<section class='standard-gap'>
       <h2>" header "</h2>
       " contents "
     </section>"))
@@ -44,47 +44,75 @@
 
 (defn board-section [emit state]
   
-  (let [{:keys [view templates gameplay]} state
+  (let [{:keys [view templates gameplay paint]} state
         {:keys [board-type template-id template-string]} view
         {:keys [auto-step?]} gameplay
+        {:keys [scale]} paint
         disabled? (true? auto-step?)]
   
      (js-template html
-       "<form class='small-gap'>
-         <select ?disabled=" disabled? " onchange=" #(emit :board-type-changed (keyword (.. % -target -value))) ">
-           <option ?selected=" (= :random board-type) " value='random'>Random (50% alive)</option>
-           <option ?selected=" (= :predefined board-type) " value='predefined'>Predefined template</option>
-           <option ?selected=" (= :custom board-type) " value='custom'>Custom template</option>
-         </select>
+       "<form class=standard-gap>
+         <div class=small-gap>
+           <label for=board-type>Board type</label>
+           <select id=board-type ?disabled=" disabled? " onchange=" #(emit :board-type-changed (keyword (.. % -target -value))) ">
+             <option ?selected=" (= :random board-type) " value='random'>Random (50% alive)</option>
+             <option ?selected=" (= :predefined board-type) " value='predefined'>Predefined template</option>
+             <option ?selected=" (= :custom board-type) " value='custom'>Custom template</option>
+           </select>
+         </div>
         "
           (when (= :predefined board-type)
-            (predefine-template-select
-             #(emit :predefined-template-selected %)
-             templates
-             template-id
-             disabled?))
+            (js-template html
+              "<div class=small-gap>
+                 <label for=predefined-template-id>Template</label>"
+                 (predefine-template-select
+                  #(emit :predefined-template-selected %)
+                  templates
+                  template-id
+                  disabled?)
+              "</div>"))
 
           (when (= :custom board-type)
             (js-template html
-              "<textarea onchange=" #(emit :custom-template-updated (.. % -target -value)) "
-                         .value=" template-string "
-                         ?disabled=" disabled? ">
-               </textarea>"))
+              "<div class=small-gap>
+                 <label for=custom-template>Custom template</label>
+                 <textarea onchange=" #(emit :custom-template-updated (.. % -target -value)) "
+                           .value=" template-string "
+                           ?disabled=" disabled? "
+                           id=custom-template>
+                 </textarea>
+               </div>"))
+       
+           "<div class=small-gap>
+              <label for=resolution>Resolution</label>
+              <input id=resolution
+                     type=range
+                     min=1
+                     max=20
+                     oninput=" #(emit :board-scale-changed (.. % -target -value)) "
+                     ?disabled=" disabled? ">
+              <output>1 cell = " (* scale scale) " px<sup>2</sup></output>
+            </div>"
        "</form>")))
 
 
 (defn gameplay-section [emit gameplay]
   
-  (let [{:keys [auto-step?]} gameplay]
+  (let [{:keys [auto-step?]} gameplay
+        start-button         (js-template html
+                                          "<button onclick=" #(emit :start-auto-play) "
+                                                   ?disabled=" (true? auto-step?) ">
+                                             Start
+                                           </button>")
+        stop-button          (js-template html
+                                          "<button onclick=" #(emit :stop-auto-play) "
+                                                   ?disabled=" (false? auto-step?) ">
+                                             Stop
+                                           </button>")]
 
     (js-template html
       "<div class=horizontal-equal>
-         <button onclick=" #(emit :start-auto-play) " ?disabled=" (true? auto-step?) ">
-           Start
-         </button>
-         <button onclick=" #(emit :stop-auto-play) " ?disabled=" (false? auto-step?) ">
-           Stop
-         </button>
+         " (if auto-step? stop-button start-button) "
          <button onclick=" #(emit :advance-one-generation) " ?disabled=" (true? auto-step?) ">
            Step
          </button>
@@ -101,11 +129,19 @@
        </p>
        <p>
          <span>Evolution time</span>
-         <span>" (.toFixed (:evolution-time stats) 0) " ms</span>
+         <span>" (.toFixed (:evolution-time stats) 1) " ms</span>
        </p>
        <p>
          <span>Paint time</span>
-         <span>" (.toFixed (:paint-time stats) 0) " ms</span>
+         <span>" (.toFixed (:paint-time stats) 1) " ms</span>
+       </p>
+       <p>
+         <span>Step time</span>
+         <span>" (if (:full-step-time stats) (.toFixed (:full-step-time stats) 1) "-") " ms</span>
+       </p>
+       <p>
+         <span>FPS</span>
+         <span>" (if (:full-step-time stats) (.toFixed (float (/ 1000 (:full-step-time stats))) 0) "-") "</span>
        </p>
      </div>"))
 

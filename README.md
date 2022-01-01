@@ -26,3 +26,7 @@ To compile both ClojureScript and Rust code:
 $ npm run wasm-rust
 $ npm run release
 ```
+
+## Resources:
+
+- https://www.conwaylife.com/ref/lexicon/lex_t.htm

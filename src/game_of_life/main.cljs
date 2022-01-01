@@ -13,10 +13,11 @@
 
 (def initial-stats
   
-  {:generation     0
-   :evolution-time 0
-   :paint-time     0
-   :full-step-time 0})
+  {:generation      0
+   :evolution-time  0
+   :paint-time      0
+   :step-start-time nil
+   :full-step-time  nil})
 
 
 (def initial-state
@@ -49,7 +50,7 @@
 (defn advance-game! [canvas !state render-fn]
   
   (let [state @!state
-        
+
         {:keys [auto-step? interval-ms]}
         (:gameplay state)
 
@@ -71,6 +72,10 @@
                 (assoc-in [:paint :board] new-board)
                 (assoc-in [:stats :evolution-time] evolution-time)
                 (assoc-in [:stats :paint-time] paint-time)
+                (assoc-in [:stats :full-step-time] (when (-> state :stats :step-start-time)
+                                                     (- (js/performance.now)
+                                                        (-> state :stats :step-start-time))))
+                (assoc-in [:stats :step-start-time] (js/performance.now))
                 (update-in [:stats :generation] inc)))
 
     (render-fn)
@@ -112,6 +117,22 @@
     (swap! !state assoc-in [:paint :board] new-board)))
 
 
+(defn- measure-and-resize-canvas! [canvas !state]
+
+  (let [[height width] (paint/board-dimensions
+                        canvas
+                        (-> @!state :paint :scale))]
+
+    (prn "Canvas measured at" height "x" width)
+
+    (paint/resize-canvas!
+     canvas height width (-> @!state :paint :scale))
+
+    (swap! !state update :paint assoc
+           :height height
+           :width width)))
+
+
 (defmulti handle-event (fn [event-id & _] event-id))
 
 
@@ -147,6 +168,17 @@
   (update-board! !state))
 
 
+(defmethod handle-event :board-scale-changed
+
+  [_ !state refs _ scale]
+
+  (swap! !state assoc-in [:paint :scale] scale)
+  (swap! !state assoc :stats initial-stats)
+  (measure-and-resize-canvas!
+   (:canvas refs) !state)
+  (update-board! !state))
+
+
 (defmethod handle-event :start-auto-play
   
   [_ !state refs render-fn]
@@ -167,22 +199,6 @@
   [_ !state refs render-fn]
   
   (advance-game! (:canvas refs) !state render-fn))
-
-
-(defn- measure-and-resize-canvas! [canvas !state]
-
-  (let [[height width] (paint/board-dimensions
-                        canvas
-                        (-> @!state :paint :scale))]
-    
-    (prn "Canvas measured at" height "x" width)
-
-    (paint/resize-canvas!
-     canvas height width (-> @!state :paint :scale))
-
-    (swap! !state update :paint assoc
-           :height height
-           :width width)))
 
 
 (defn -main []

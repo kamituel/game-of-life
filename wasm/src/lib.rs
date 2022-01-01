@@ -1,7 +1,7 @@
 use wasm_bindgen::prelude::*;
 
 
-static neighbours_coordinates_offsets: [(i32, i32); 8] = [
+static NEIGHBOURS_COORDINATES_OFFSETS: [(i32, i32); 8] = [
     (-1, -1),
     (-1, 0),
     (-1, 1),
@@ -12,9 +12,6 @@ static neighbours_coordinates_offsets: [(i32, i32); 8] = [
     (1, 1)
 ];
 
-// fn count_alive_neighbours (board: &[u32], width: u32, coordinates: (u32, u32)) -> u32 {
-//     return 5;
-// }
 
 fn offset_position (size: u32, pos: u32, offset: i32) -> u32 {
     let result = (pos as i32) + offset;
@@ -29,7 +26,8 @@ fn offset_position (size: u32, pos: u32, offset: i32) -> u32 {
 }
 
 
-fn evolve (board: &[u8], width: u32, new_board: &mut[u8]) {
+#[wasm_bindgen]
+pub fn evolve (board: &[u8], width: u32, new_board: &mut[u8]) {
 
     let height = board.len() as u32 / width;
 
@@ -38,7 +36,7 @@ fn evolve (board: &[u8], width: u32, new_board: &mut[u8]) {
         let col_index = (pos as u32) % width;
         let mut number_of_alive_neighbours = 0;
 
-        for neighbour_coord in neighbours_coordinates_offsets {
+        for neighbour_coord in NEIGHBOURS_COORDINATES_OFFSETS {
             let (row_offset, col_offset) = neighbour_coord;
             let neigh_row_index = offset_position(height, row_index, row_offset);
             let neigh_col_index = offset_position(width, col_index, col_offset);
@@ -60,15 +58,5 @@ fn evolve (board: &[u8], width: u32, new_board: &mut[u8]) {
         };
 
         new_board[pos] = next_status;
-
-        // println!("Pos {0} {1} {2}, {3}, {4}", pos, status, number_of_alive_neighbours, status, next_status);
     }
-}
-
-
-#[wasm_bindgen]
-pub fn main (board: &[u8], width: u32, new_board: &mut [u8]) {
-    println!("CXX");
-    // let mut new_board: [u32; 12] = [0; 12];
-    evolve(board, width, new_board);
 }

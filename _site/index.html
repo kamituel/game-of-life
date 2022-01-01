@@ -10,7 +10,7 @@
       }
 
       :root {
-        background-color: hsl(120deg, 10%, 40%);
+        background-color: hsl(120deg, 10%, 30%);
         color: white;
         font-size: .9rem;
       }
@@ -21,8 +21,8 @@
       }
 
       body {
-        --gap-small: 1em;
-        --gap-standard: 2em;
+        --gap-small: .75em;
+        --gap-standard: 1.5em;
         --gap-large: 4em;
         --app-padding: var(--gap-standard);
       }
@@ -50,12 +50,19 @@
         gap: var(--gap-standard);
       }
 
+      input,
       select,
       button,
       textarea {
         padding: .6em .3em;
       }
 
+      input[type=range] {
+        padding-top: 0;
+        padding-bottom: 0;
+      }
+
+      input,
       select,
       button,
       textarea,
@@ -115,10 +122,18 @@
         gap: var(--gap-small);
       }
 
-      .small-gap {
+      .small-gap,
+      .standard-gap {
         display: flex;
         flex-direction: column;
+      }
+
+      .small-gap {
         gap: var(--gap-small);
+      }
+
+      .standard-gap {
+        gap: var(--gap-standard);
       }
 
       .hidden {

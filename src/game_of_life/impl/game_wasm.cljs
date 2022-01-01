@@ -47,5 +47,5 @@
   [_ board _height width]
 
   (let [result (js/window.Uint8Array. (.-length board))]
-    (js/wasm_bindgen.main board width result)
+    (js/wasm_bindgen.evolve board width result)
     result))
